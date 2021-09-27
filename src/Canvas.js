@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react'
 
 const Canvas = props => {
@@ -11,57 +10,89 @@ const Canvas = props => {
         canvas.height = window.innerHeight
         const c = canvas.getContext('2d')
 
-        // set location of first corner of triangle
+
+
+        const finishedTriangles = []
+
+        function Triangle(x, y, size) {
+
+            this.x1 = x
+            this.y1 = y
+            this.x2 = 1 * size + x
+            this.y2 = 4 * size + y
+            this.x3 = 4 * size + x
+            this.y3 = 1 * size + y
+
+            this.drawn = false
+
+            this.draw = function () {
+                c.moveTo(this.x1, this.y1)
+                c.lineTo(this.x2, this.y2)
+                c.lineTo(this.x3, this.y3)
+                c.closePath()
+                c.strokeStyle = 'black'
+                c.stroke()
+            }
+        }
+        //started by setting base coordinates for a משולש שווה צלעות
+
+
 
         //set size of triangle 
+        let size = 1
 
-
-
-
-
-
-
-
-        // this is how i figure out how long i clicked for
 
         let timeMouseClicked = 0
         let timer
 
+
         canvas.addEventListener('mousedown', (e) => {
-            let size = 1
-            //base coordinates for equal sided triangle are (0,0), (10,40), (40,10)
-
+            size = 1
             timer = setInterval(() => {
-                // every 0.2 seconds i count the time clicked and add it to size
-                // I then use the click location for the first corner and use
-                // size to calculate where the other corners should be
-
-                timeMouseClicked += 0.02
+                //when clicked, timer will start
+                timeMouseClicked += 0.05
                 size += timeMouseClicked
-                console.log(timeMouseClicked)
-                //i draw and erase the triangle every 0.2 seconds so you see
-                //the triangle growing
-                c.clearRect(0, 0, canvas.width, canvas.height)
-                c.beginPath()
-                c.moveTo(e.x, e.y)
-                c.lineTo(10 * size + e.x, 40 * size + e.y)
-                c.lineTo(40 * size + e.x, 10 * size + e.y)
-                c.closePath()
-                c.strokeStyle = 'black'
-                c.stroke()
+                // let drawingTriangle = new Triangle(e.x, e.y, size)
+                // c.clearRect(0, 0, canvas.width, canvas.height)
+                // drawingTriangle.draw()
 
-            }, 30)
-
+                // console.log(timeMouseClicked)
+            }, 10)
 
         })
-        canvas.addEventListener('mouseup', () => {
-
+        canvas.addEventListener('mouseup', (e) => {
+            // console.log(timeMouseClicked)
             // here i stop the interval and set the size based on how long the mouse was held down
+            finishedTriangles.push(new Triangle(e.x, e.y, size))
+            c.clearRect(0, 0, canvas.width, canvas.height)
+            console.log(finishedTriangles)
             clearInterval(timer)
             // i also reset the variable that stores the amount of time the mouse was held down
             timeMouseClicked = 0
+            // console.log(size)
+
+            //then i draw the triangle with the updated size value
+
+            animate()
         })
 
+
+
+
+        function animate() {
+            c.clearRect(0, 0, canvas.width, canvas.height)
+            finishedTriangles.forEach(triangle => {
+                if (triangle.drawn === false) {
+                    triangle.draw()
+                    triangle.drawn = true
+                }
+
+            })
+
+
+
+
+        }
 
 
 
